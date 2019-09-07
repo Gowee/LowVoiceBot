@@ -189,7 +189,7 @@ async def whisper_inline_handler(query: InlineQuery):
 
 
 @dispatcher.callback_query_handler()
-async def whisper_reveal_handler(query: CallbackQuery):
+async def whisper_callback_handler(query: CallbackQuery):
     logger.debug(f"whisper_reveal_handler")
 
     def answer_error(error_text):
