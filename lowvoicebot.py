@@ -98,7 +98,7 @@ async def start_handler(message: types.Message):
             parse_mode=ParseMode.MARKDOWN,
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[InlineKeyboardButton("Start", switch_inline_query="")]
+                inline_keyboard=[[InlineKeyboardButton("Start", switch_inline_query="")]]
             ),
         )
     else:
@@ -187,7 +187,7 @@ async def whisper_inline_handler(query: InlineQuery):
             title=f"With Save button",
             input_message_content=input_content,
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[button_reveal, button_save, button_expire]
+                inline_keyboard=[[button_reveal, button_save, button_expire]]
             ),
         )
         item_nosave = InlineQueryResultArticle(
@@ -196,7 +196,7 @@ async def whisper_inline_handler(query: InlineQuery):
             title=f"Without Save button",
             input_message_content=input_content,
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[button_reveal, button_expire]
+                inline_keyboard=[[button_reveal, button_expire]]
             ),
         )
         try:
