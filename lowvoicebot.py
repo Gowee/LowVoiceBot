@@ -17,6 +17,7 @@ from aiogram.types import InlineQuery, InputTextMessageContent, InlineQueryResul
 from aiogram.utils.exceptions import InvalidQueryID
 from aiogram.types.message import ParseMode
 from aiogram.dispatcher.filters.builtin import CommandStart
+from aiogram.dispatcher.handler import SkipHandler
 
 types.User.__repr__ = lambda u: f"User({u.mention})"
 
@@ -78,13 +79,18 @@ bot = Bot(token=bot_token)
 dispatcher = Dispatcher(bot)
 
 
-# @dispatcher.message_handler(commands=["start"])
-# async def start_handler(message: types.Message):
-#     logger.debug(f"start_handler:{message.text}")
-#     args = message.get_args()
-#     if not args:
-#         await message.reply("Low Voice Bot helps send ㊙️private ✉️messages in public groups."
-#                             "\n[How to start?](https://github.com/Gowee/LowVoiceBot#How?)", parse_mode=ParseMode.MARKDOWN)
+# Due to the design limitation of aiogram, the precedence of handler cannot be specified explicitly and only one
+# handler can be triggered per message (unless `raise SkipHandler`).
+# Therefore, this more generic handler should be loaded after the above so that the above won't be shaded.
+@dispatcher.message_handler(commands=["start"])
+async def start_handler(message: types.Message):
+    logger.debug(f"start_handler:{message.text}")
+    args = message.get_args()
+    if not args:
+        await message.reply("Low Voice Bot helps send ㊙️private ✉️messages in public groups."
+                            "\n[How to start?](https://github.com/Gowee/LowVoiceBot#How)", parse_mode=ParseMode.MARKDOWN)
+    else:
+        raise SkipHandler
 
 @dispatcher.message_handler(CommandStart(re.compile(r"SAVE\_(?P<whisper_id>.+)")))
 async def start_save_handler(message: types.Message, deep_link: re.Match):
@@ -219,7 +225,7 @@ async def whisper_callback_handler(query: CallbackQuery):
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    #logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.DEBUG)
 
     executor.start_polling(dispatcher)
 
