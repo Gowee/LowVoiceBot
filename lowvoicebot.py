@@ -12,8 +12,14 @@ from time import time as now
 from async_lru import alru_cache
 from aiohttp import ClientSession as HTTPClientSession
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import InlineQuery, InputTextMessageContent, InlineQueryResultArticle, InlineKeyboardMarkup, \
-    InlineKeyboardButton, CallbackQuery
+from aiogram.types import (
+    InlineQuery,
+    InputTextMessageContent,
+    InlineQueryResultArticle,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    CallbackQuery,
+)
 from aiogram.utils.exceptions import InvalidQueryID
 from aiogram.types.message import ParseMode
 from aiogram.dispatcher.filters.builtin import CommandStart
@@ -21,7 +27,7 @@ from aiogram.dispatcher.handler import SkipHandler
 
 types.User.__repr__ = lambda u: f"User({u.mention})"
 
-logger = logging.getLogger('lowvoicebot')
+logger = logging.getLogger("lowvoicebot")
 
 
 class BotTokenUnspecified(Exception):
@@ -87,11 +93,14 @@ async def start_handler(message: types.Message):
     logger.debug(f"start_handler:{message.text}")
     args = message.get_args()
     if not args:
-        await message.reply("Low Voice Bot helps send ㊙️private ✉️messages in public groups.",
-                            parse_mode=ParseMode.MARKDOWN,
-                            disable_web_page_preview=True,
-                            reply_markup=InlineKeyboardMarkup(
-                                inline_keyboard=[InlineKeyboardButton("Start", switch_inline_query="")]))
+        await message.reply(
+            "Low Voice Bot helps send ㊙️private ✉️messages in public groups.",
+            parse_mode=ParseMode.MARKDOWN,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[InlineKeyboardButton("Start", switch_inline_query="")]
+            ),
+        )
     else:
         raise SkipHandler
 
@@ -107,12 +116,16 @@ async def start_save_handler(message: types.Message, deep_link: re.Match):
         whisper = whispers.get(whisper_id)
         if whisper is None:
             logger.debug(f"start_handler:Invalid whisper id: {whisper_id}")
-            raise ReadableException(
-                "⏲️🔔/❌ The message is expired or non-existent.")
-        if message.from_user.username != whisper.recipient and message.from_user != whisper.sender:
-            raise ReadableException(
-                "🚫 You are neither the sender nor recipient.")
-        await message.answer(f"_Message from_ {whisper.sender.mention} _to_ @{whisper.recipient}:\n\n{whisper.content}", parse_mode=ParseMode.MARKDOWN)
+            raise ReadableException("⏲️🔔/❌ The message is expired or non-existent.")
+        if (
+            message.from_user.username != whisper.recipient
+            and message.from_user != whisper.sender
+        ):
+            raise ReadableException("🚫 You are neither the sender nor recipient.")
+        await message.answer(
+            f"_Message from_ {whisper.sender.mention} _to_ @{whisper.recipient}:\n\n{whisper.content}",
+            parse_mode=ParseMode.MARKDOWN,
+        )
     except ReadableException as e:
         await message.reply(e.content, parse_mode=ParseMode.MARKDOWN)
 
@@ -130,38 +143,52 @@ async def whisper_inline_handler(query: InlineQuery):
         sender = query.from_user
         if not query.query:
             raise ReadableException(
-                (f"EMPTY_ARG",
-                 f"ℹ️ Show Usage",
-                 f"ℹ️ Usage: `@{bot_username} @RECIPIENT message)`"))
+                (
+                    f"EMPTY_ARG",
+                    f"ℹ️ Show Usage",
+                    f"ℹ️ Usage: `@{bot_username} @RECIPIENT message)`",
+                )
+            )
         try:
             recipient, whisper = query.query.split(maxsplit=2)
         except ValueError:
-            raise ReadableException(("USAGE_ERROR",
-                                     "❌ Usage Error",
-                                     f"❌ Usage Error\nUsage: `@{bot_username} @RECIPIENT message`"))
+            raise ReadableException(
+                (
+                    "USAGE_ERROR",
+                    "❌ Usage Error",
+                    f"❌ Usage Error\nUsage: `@{bot_username} @RECIPIENT message`",
+                )
+            )
 
         if recipient.startswith("@"):
             recipient = recipient[1:]
         recipient_name = await resolve_user(recipient)
         if recipient_name is None:
             raise ReadableException(
-                ("INVALID_USERNAME", "❌ Invalid Username", "❌ Invalid Username"))
+                ("INVALID_USERNAME", "❌ Invalid Username", "❌ Invalid Username")
+            )
         whisper_id = f"WHISPER-{int(now()):x}-{id(whisper):x}"
         input_content = InputTextMessageContent(
-            f"*㊙️Private Message✉️*\n_To_ {recipient_name}(@{recipient}),\nexpiring in 30 minutes.", parse_mode=ParseMode.MARKDOWN)
+            f"*㊙️Private Message✉️*\n_To_ {recipient_name}(@{recipient}),\nexpiring in 30 minutes.",
+            parse_mode=ParseMode.MARKDOWN,
+        )
         button_reveal = InlineKeyboardButton(
-            "🔎 Reveal", callback_data=f"REVEAL|{whisper_id}")
+            "🔎 Reveal", callback_data=f"REVEAL|{whisper_id}"
+        )
         button_save = InlineKeyboardButton(
-            "💾 Save", url=f"https://t.me/{bot_username}?start=SAVE_{whisper_id}")
+            "💾 Save", url=f"https://t.me/{bot_username}?start=SAVE_{whisper_id}"
+        )
         button_expire = InlineKeyboardButton(
-            "🛑 Expire", callback_data=f"EXPIRE|{whisper_id}")
+            "🛑 Expire", callback_data=f"EXPIRE|{whisper_id}"
+        )
         item_default = InlineQueryResultArticle(
             id=f"{whisper_id}-1",
             # f'✉️ To {recipient_name}, ⏲️ Expire in 30 minutes',
-            title=f'With Save button',
+            title=f"With Save button",
             input_message_content=input_content,
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[button_reveal, button_save, button_expire]),
+                inline_keyboard=[button_reveal, button_save, button_expire]
+            ),
         )
         item_nosave = InlineQueryResultArticle(
             id=f"{whisper_id}-2",
@@ -169,28 +196,30 @@ async def whisper_inline_handler(query: InlineQuery):
             title=f"Without Save button",
             input_message_content=input_content,
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[button_reveal, button_expire]),
+                inline_keyboard=[button_reveal, button_expire]
+            ),
         )
         try:
-            if (await query.answer(results=[item_default, item_nosave], cache_time=3, is_personal=True)) is True:
+            if (
+                await query.answer(
+                    results=[item_default, item_nosave], cache_time=3, is_personal=True
+                )
+            ) is True:
                 logger.info(
-                    f"From {sender.mention} to {recipient_name}(@{recipient}): WHISPER_REDACTED")
+                    f"From {sender.mention} to {recipient_name}(@{recipient}): WHISPER_REDACTED"
+                )
                 whispers[whisper_id] = WhisperEntry(sender, recipient, whisper)
                 # TODO: permenant trhu  encryption
                 expiring_tasks[whisper_id] = asyncio.create_task(
-                    expire_whisper(whisper_id, 1800))
+                    expire_whisper(whisper_id, 1800)
+                )
         except InvalidQueryID as e:
             logger.debug(f"{e} query: {query}, message: {whisper}")
     except ReadableException as e:
         logger.debug(f"whisper_inline_handler:ReadableException({e.content})")
-        input_content = InputTextMessageContent(
-            e.content[2],
-            ParseMode.MARKDOWN
-        )
+        input_content = InputTextMessageContent(e.content[2], ParseMode.MARKDOWN)
         item = InlineQueryResultArticle(
-            id=e.content[0],
-            title=e.content[1],
-            input_message_content=input_content
+            id=e.content[0], title=e.content[1], input_message_content=input_content
         )
         try:
             await query.answer(results=[item], cache_time=3600)
@@ -204,20 +233,26 @@ async def whisper_callback_handler(query: CallbackQuery):
 
     def answer_error(error_text):
         return query.answer(error_text, cache_time=1800)
+
     try:
         action, whisper_id = query.data.split("|", maxsplit=2)
         whisper = whispers.get(whisper_id)
         if whisper is None:
             logger.debug(
-                f"whisper_reveal_handler:Invalid whisper id, data: {query.data}")
-            raise ReadableException(
-                "⏲️🔔/❌ The message is expired or non-existent.")
-        if query.from_user.username != whisper.recipient and query.from_user != whisper.sender:
-            raise ReadableException(
-                "🚫 You are neither the sender nor recipient.")
+                f"whisper_reveal_handler:Invalid whisper id, data: {query.data}"
+            )
+            raise ReadableException("⏲️🔔/❌ The message is expired or non-existent.")
+        if (
+            query.from_user.username != whisper.recipient
+            and query.from_user != whisper.sender
+        ):
+            raise ReadableException("🚫 You are neither the sender nor recipient.")
         if action == "REVEAL":
-            await query.answer(f"From {whisper.sender.mention} to @{whisper.recipient}:\n\n{whisper.content}",
-                               cache_time=30, show_alert=True)
+            await query.answer(
+                f"From {whisper.sender.mention} to @{whisper.recipient}:\n\n{whisper.content}",
+                cache_time=30,
+                show_alert=True,
+            )
         elif action == "EXPIRE":
             await expire_whisper(whisper_id)
             await query.answer(f"✅ Successfully expired.", cache_time=1800)
