@@ -8,4 +8,4 @@ WORKDIR /app
 COPY . .
 RUN pip install -r requirements.txt; \
     chmod +x lowvoicebot.py
-ENTRYPOINT ["lowvoicebot.py"]
+ENTRYPOINT ["/app/lowvoicebot.py"]
