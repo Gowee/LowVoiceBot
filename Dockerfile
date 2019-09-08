@@ -1,4 +1,4 @@
-FROM python/slim
+FROM python:slim
 
 RUN set -eux; \
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
