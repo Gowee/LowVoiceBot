@@ -87,10 +87,11 @@ async def start_handler(message: types.Message):
     logger.debug(f"start_handler:{message.text}")
     args = message.get_args()
     if not args:
-        await message.reply("Low Voice Bot helps send ㊙️private ✉️messages in public groups."
-                            "\n[How to start?](https://github.com/Gowee/LowVoiceBot#How)",
+        await message.reply("Low Voice Bot helps send ㊙️private ✉️messages in public groups.",
                             parse_mode=ParseMode.MARKDOWN,
-                            disable_web_page_preview=True)
+                            disable_web_page_preview=True,
+                            reply_markup=InlineKeyboardMarkup(
+                                inline_keyboard=[InlineKeyboardButton("Start", switch_inline_query="")]))
     else:
         raise SkipHandler
 
@@ -160,7 +161,7 @@ async def whisper_inline_handler(query: InlineQuery):
             title=f'With Save button',
             input_message_content=input_content,
             reply_markup=InlineKeyboardMarkup(
-                1, [[button_reveal, button_save, button_expire]]),
+                inline_keyboard=[button_reveal, button_save, button_expire]),
         )
         item_nosave = InlineQueryResultArticle(
             id=f"{whisper_id}-2",
@@ -168,7 +169,7 @@ async def whisper_inline_handler(query: InlineQuery):
             title=f"Without Save button",
             input_message_content=input_content,
             reply_markup=InlineKeyboardMarkup(
-                1, [[button_reveal, button_expire]]),
+                inline_keyboard=[button_reveal, button_expire]),
         )
         try:
             if (await query.answer(results=[item_default, item_nosave], cache_time=3, is_personal=True)) is True:
