@@ -150,7 +150,7 @@ async def whisper_inline_handler(query: InlineQuery):
                 )
             )
         try:
-            recipient, whisper = query.query.split(maxsplit=2)
+            recipient, whisper = query.query.split(maxsplit=1)
         except ValueError:
             raise ReadableException(
                 (
@@ -235,7 +235,7 @@ async def whisper_callback_handler(query: CallbackQuery):
         return query.answer(error_text, cache_time=1800)
 
     try:
-        action, whisper_id = query.data.split("|", maxsplit=2)
+        action, whisper_id = query.data.split("|", maxsplit=1)
         whisper = whispers.get(whisper_id)
         if whisper is None:
             logger.debug(
