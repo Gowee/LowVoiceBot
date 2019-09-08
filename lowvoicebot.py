@@ -94,7 +94,7 @@ async def start_handler(message: types.Message):
     args = message.get_args()
     if not args:
         await message.reply(
-            "Low Voice Bot helps send ㊙️private ✉️messages in public groups.",
+            "Low Voice Bot helps send *private ️messages* in public groups.",
             parse_mode=ParseMode.MARKDOWN,
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
@@ -169,7 +169,7 @@ async def whisper_inline_handler(query: InlineQuery):
             )
         whisper_id = f"WHISPER-{int(now()):x}-{id(whisper):x}"
         input_content = InputTextMessageContent(
-            f"*㊙️Private Message✉️*\n_To_ {recipient_name}(@{recipient}),\nexpiring in 30 minutes.",
+            f"*Private Message*\n_To_ {recipient_name}(@{recipient}),\nexpiring in 30 minutes.",
             parse_mode=ParseMode.MARKDOWN,
         )
         button_reveal = InlineKeyboardButton(
