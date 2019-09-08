@@ -88,9 +88,12 @@ async def start_handler(message: types.Message):
     args = message.get_args()
     if not args:
         await message.reply("Low Voice Bot helps send ㊙️private ✉️messages in public groups."
-                            "\n[How to start?](https://github.com/Gowee/LowVoiceBot#How)", parse_mode=ParseMode.MARKDOWN)
+                            "\n[How to start?](https://github.com/Gowee/LowVoiceBot#How)",
+                            parse_mode=ParseMode.MARKDOWN,
+                            disable_web_page_preview=True)
     else:
         raise SkipHandler
+
 
 @dispatcher.message_handler(CommandStart(re.compile(r"SAVE\_(?P<whisper_id>.+)")))
 async def start_save_handler(message: types.Message, deep_link: re.Match):
