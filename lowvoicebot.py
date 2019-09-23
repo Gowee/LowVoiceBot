@@ -66,12 +66,15 @@ whispers = dict()
 
 expiring_tasks = dict()
 
-
-async def expire_whisper(id, in_seconds=0):
-    await asyncio.sleep(in_seconds)
-    expired_whisper = whispers.pop(id)
-    del expiring_tasks[id]
-    logger.debug(f"Message expired: {expired_whisper!s}")
+def expire_whisper(id, in_seconds=0):
+    if id in expiring_tasks:
+        expiring_tasks[id].cancel()
+        del expiring_tasks[id]
+    async def _expire_whisper(id, in_seconds):
+        await asyncio.sleep(in_seconds)
+        expired_whisper = whispers.pop(id)
+        logger.debug(f"Message expired: {expired_whisper!s}")
+    return _expire_whisper(id, in_seconds)
 
 
 bot_token = os.environ.get("BOT_TOKEN")
@@ -211,7 +214,7 @@ async def whisper_inline_handler(query: InlineQuery):
                 whispers[whisper_id] = WhisperEntry(sender, recipient, whisper)
                 # TODO: permenant trhu  encryption
                 expiring_tasks[whisper_id] = asyncio.create_task(
-                    expire_whisper(whisper_id, 1800)
+                    expire_whisper(whisper_id, 15)
                 )
         except InvalidQueryID as e:
             logger.debug(f"{e} query: {query}, message: {whisper}")
