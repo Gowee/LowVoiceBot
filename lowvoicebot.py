@@ -5,7 +5,6 @@ import sys
 import os
 from collections import namedtuple
 import re
-from re import Match
 import asyncio
 from time import time as now
 
@@ -53,7 +52,7 @@ async def resolve_user(username):
         HTTP_SESSION = HTTPClientSession()
     try:
         async with HTTP_SESSION.get(f"https://t.me/{username}") as response:
-            assert response.status is 200
+            assert response.status == 200
             return REGEX_RESOLVE_USER.search(await response.text()).group(1)
     except Exception as e:
         logger.debug(f"Failed to resolve {username} with error {e}")
