@@ -65,14 +65,17 @@ whispers = dict()
 
 expiring_tasks = dict()
 
+
 def expire_whisper(id, in_seconds=0):
     if id in expiring_tasks:
         expiring_tasks[id].cancel()
         del expiring_tasks[id]
+
     async def _expire_whisper(id, in_seconds):
         await asyncio.sleep(in_seconds)
         expired_whisper = whispers.pop(id)
         logger.debug(f"Message expired: {expired_whisper!s}")
+
     return _expire_whisper(id, in_seconds)
 
 
@@ -100,7 +103,9 @@ async def start_handler(message: types.Message):
             parse_mode=ParseMode.MARKDOWN,
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton("Start", switch_inline_query="")]]
+                inline_keyboard=[
+                    [InlineKeyboardButton("Start", switch_inline_query="")]
+                ]
             ),
         )
     else:
