@@ -41,7 +41,9 @@ class ReadableException(Exception):
         super().__init__(*args, **kwargs)
 
 
-REGEX_RESOLVE_USER = re.compile(r'<div\ class="tgme_page_title">(.+?)</div>')
+REGEX_RESOLVE_USER = re.compile(
+    r'<div class="tgme_page_title"><span dir="auto">(.+?)</span></div>'
+)
 HTTP_SESSION = None
 
 
