@@ -7,7 +7,8 @@ RUN set -eux; \
     pip install poetry
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
-RUN poetry install
+RUN poetry config settings.virtualenvs.create false; \
+    poetry install
 COPY . .
 RUN chmod +x lowvoicebot.py
 ENTRYPOINT ["/app/lowvoicebot.py"]
