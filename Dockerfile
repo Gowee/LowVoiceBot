@@ -3,10 +3,12 @@ FROM python:slim
 RUN set -eux; \
     apt-get update; \
     apt-get install -y curl; \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
+    pip install poetry
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY pyproject.toml poetry.lock ./
+RUN poetry config virtualenvs.create false; \
+    poetry install
 COPY . .
 RUN chmod +x lowvoicebot.py
 ENTRYPOINT ["/app/lowvoicebot.py"]
