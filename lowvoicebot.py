@@ -220,7 +220,7 @@ async def whisper_inline_handler(query: InlineQuery):
                 whispers[whisper_id] = WhisperEntry(sender, recipient, whisper)
                 # TODO: permenant trhu  encryption
                 expiring_tasks[whisper_id] = asyncio.create_task(
-                    expire_whisper(whisper_id, 15)
+                    expire_whisper(whisper_id, 30 * 60)
                 )
         except InvalidQueryID as e:
             logger.debug(f"{e} query: {query}, message: {whisper}")
