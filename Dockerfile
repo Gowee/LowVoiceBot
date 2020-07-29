@@ -6,7 +6,7 @@ RUN set -eux; \
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
     pip install poetry
 WORKDIR /app
-COPY pyproject.toml poetry.lock .
+COPY pyproject.toml poetry.lock ./
 RUN poetry install
 COPY . .
 RUN chmod +x lowvoicebot.py
