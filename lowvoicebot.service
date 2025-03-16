@@ -1,0 +1,14 @@
+[Unit]
+Description=Low Voice Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/gowe/etc/ivrssbot
+ExecStart=/home/gowe/etc/ivrssbot/run.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
